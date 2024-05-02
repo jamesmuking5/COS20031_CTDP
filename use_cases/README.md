@@ -50,3 +50,29 @@ Here's a breakdown of the script:
 10. `DROP PROCEDURE IF EXISTS GetPropertiesByCity;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
 
 ## USE_CASE_3:
+
+This SQL script is creating a stored procedure named `GetPropertiesByEmail` that takes an email address as an input and returns a list of properties associated with that email, along with their property type and the user details.
+
+Here's a breakdown of the script:
+
+1. `DROP PROCEDURE IF EXISTS GetPropertiesByEmail;` - This line checks if a procedure named `GetPropertiesByEmail` already exists in the database. If it does, it drops (deletes) it.
+
+2. `DELIMITER //` - This line changes the delimiter from the default semicolon (`;`) to double slashes (`//`). This is done because the stored procedure contains semicolons, and we don't want MySQL to think those are the end of the statement.
+
+3. `CREATE PROCEDURE GetPropertiesByEmail(IN email_address VARCHAR(64))` - This line creates a new stored procedure named `GetPropertiesByEmail`. It takes one input parameter, `email_address`, which is a string of up to 64 characters.
+
+4. The `BEGIN ... END` block contains the SQL that will be run when the stored procedure is called. It's a `SELECT` statement that joins the `property`, `property_type`, and `property_owner` tables and filters for properties where the owner's email matches the input `email_address`.
+
+5. `FROM property p JOIN property_type pt ON p.pType_id = pt.pType_id JOIN property_owner po ON p.user_id = po.user_id` - These lines join the `property` table (aliased as `p`), `property_type` table (aliased as `pt`), and `property_owner` table (aliased as `po`) based on the `pType_id` and `user_id`.
+
+6. `WHERE po.user_email = email_address;` - This line filters the results to only include properties where the owner's email matches the input `email_address`.
+
+7. `END //` - This line marks the end of the stored procedure.
+
+8. `DELIMITER ;` - This line changes the delimiter back to the default semicolon (`;`).
+
+9. `CALL GetPropertiesByEmail('citzcovich8@weebly.com');` - This line calls the stored procedure with 'citzcovich8@weebly.com' as the input email.
+
+10. `DROP PROCEDURE IF EXISTS GetPropertiesByEmail;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
+
+## USE_CASE_4:
