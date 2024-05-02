@@ -1,0 +1,86 @@
+
+1) Duration between the time of complaint and resolution. (use date opened/date closed)
+2) Search for resolution duration (date closed - opened and sort by longest to shortest)
+3) Add address property - get property type count (to decide how many property types)
+
+	
+4) User authentication (requries psudocode to explain fully) - "SELECT * FROM property_owner WHERE user_email = 'johndoe@example.com' AND user_password = 'password123';"
+
+5) Find all properties (including type description) owned by a user with a specific email address:
+SQL
+SELECT p.property_id, p.type, pt.pType_Desc
+FROM property p
+INNER JOIN property_owner po ON p.user_id = po.user_id
+INNER JOIN property_type pt ON p.pType_id = pt.pType_id
+WHERE po.user_email = 'user@email.com';
+
+6) List all open cases (date_closed is NULL) for properties of a specific type (e.g., 'Apartment') along with the owner's name:
+SQL
+SELECT c.case_ref_id, p.type, po.user_name
+FROM cases c
+INNER JOIN property p ON c.property_id = p.property_id
+INNER JOIN property_owner po ON p.user_id = po.user_id
+WHERE p.type = 'Apartment' AND c.date_closed IS NULL;
+
+7) Find the total number of properties under development (development_status = 1) for each property type:
+SQL
+SELECT pt.pType_Desc, COUNT(*) AS total_under_development
+FROM property p
+INNER JOIN property_type pt ON p.pType_id = pt.pType_id
+WHERE p.development_status = 1
+GROUP BY pt.pType_Desc;
+
+8) List all users who own more than one property (including property count):
+SQL
+SELECT po.user_id, po.user_name, COUNT(*) AS property_count
+FROM property_owner po
+INNER JOIN property p ON po.user_id = p.user_id
+GROUP BY po.user_id
+HAVING property_count > 1;
+
+9) Find properties with floorplan defects reported in cases, excluding those resolved (date_closed is not NULL):
+SQL
+SELECT p.property_id, p.type
+FROM property p
+INNER JOIN cases c ON p.property_id = c.property_id
+WHERE c.floorplan_defect IS NOT NULL AND c.date_closed IS NULL;
+
+10) Identify staff members who haven't closed any cases yet (date_closed is NULL for all their cases):
+SQL
+SELECT staff_id
+FROM staff s
+LEFT JOIN cases c ON s.staff_id = c.staff_id
+GROUP BY staff_id
+HAVING COUNT(c.case_ref_id) > 0 AND SUM(CASE WHEN c.date_closed IS NULL THEN 1 ELSE 0 END) = COUNT(c.case_ref_id);
+
+11) Find the user with the most open cases (date_closed is NULL):
+SQL
+SELECT po.user_name, COUNT(*) AS open_cases
+FROM property_owner po
+INNER JOIN cases c ON po.user_id = c.user_id
+WHERE c.date_closed IS NULL
+GROUP BY po.user_id
+ORDER BY open_cases DESC
+LIMIT 1;
+
+12) Find the average number of properties owned per user:
+SQL
+SELECT AVG(property_count) AS avg_properties_per_user
+FROM (
+  SELECT po.user_id, COUNT(*) AS property_count
+  FROM property_owner po
+  INNER JOIN property p ON po.user_id = p.user_id
+  GROUP BY po.user_id
+) AS user_properties;
+
+13) List all properties of a specific owner (using user_id) with their development status:
+SQL
+SELECT p.property_id, p.type, 
+  CASE WHEN p.development_status = 0 THEN 'Not Under Development'
+       WHEN p.development_status = 1 THEN 'Under Development'
+  END AS development_status
+FROM property p
+WHERE p.user_id = 1001;
+
+
+
