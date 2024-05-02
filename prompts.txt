@@ -1,3 +1,6 @@
 i have 300 entries in the property_owner table, and i want to generate around 1 - 6 properties for each owner into another table called property. I also want to add a foreign key to the property entry with the user_id of the property_owner linking back. I also have another table called property_type that has 8 entries and 2 columns (pType_id and pType_desc) that  describes the property type (e.g.,  pType_desc: bungalow, semi-detached single, etc.). I want the property table to have a foreign key linking to this table to identify as a property type.
 
 
+
+
+
