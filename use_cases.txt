@@ -1,6 +1,7 @@
 
 1) Duration between the time of complaint and resolution. (use date opened/date closed)
 2) Search for resolution duration (date closed - opened and sort by longest to shortest)
+
 3) Add address property - get property type count (to decide how many property types)
 
 	
