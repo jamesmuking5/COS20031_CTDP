@@ -76,3 +76,29 @@ Here's a breakdown of the script:
 10. `DROP PROCEDURE IF EXISTS GetPropertiesByEmail;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
 
 ## USE_CASE_4:
+
+This SQL script is creating a stored procedure named `GetCasesByDateClosed` that takes a date as an input and returns a list of cases that were closed on that date. The cases are associated with properties of a certain type and the owner's name and email are also returned.
+
+Here's a breakdown of the script:
+
+1. `DROP PROCEDURE IF EXISTS GetCasesByDateClosed;` - This line checks if a procedure named `GetCasesByDateClosed` already exists in the database. If it does, it drops (deletes) it.
+
+2. `DELIMITER //` - This line changes the delimiter from the default semicolon (`;`) to double slashes (`//`). This is done because the stored procedure contains semicolons, and we don't want MySQL to think those are the end of the statement.
+
+3. `CREATE PROCEDURE GetCasesByDateClosed(IN date_closed_value DATE)` - This line creates a new stored procedure named `GetCasesByDateClosed`. It takes one input parameter, `date_closed_value`, which is a date.
+
+4. The `BEGIN ... END` block contains the SQL that will be run when the stored procedure is called. It's a `SELECT` statement that joins the `cases`, `property`, `property_type`, `property_owner`, and `internal_staff` tables and filters for cases where the `date_closed` matches the input `date_closed_value` or both are `NULL`.
+
+5. `FROM cases c JOIN property p ON c.property_id = p.property_id JOIN property_type pt ON p.pType_id = pt.pType_id JOIN property_owner po ON c.user_id = po.user_id JOIN internal_staff s ON c.staff_id = s.staff_id` - These lines join the `cases` table (aliased as `c`), `property` table (aliased as `p`), `property_type` table (aliased as `pt`), `property_owner` table (aliased as `po`), and `internal_staff` table (aliased as `s`) based on the `property_id`, `pType_id`, `user_id`, and `staff_id`.
+
+6. `WHERE (c.date_closed = date_closed_value OR (date_closed_value IS NULL AND c.date_closed IS NULL));` - This line filters the results to only include cases where the `date_closed` matches the input `date_closed_value` or both are `NULL`.
+
+7. `END //` - This line marks the end of the stored procedure.
+
+8. `DELIMITER ;` - This line changes the delimiter back to the default semicolon (`;`).
+
+9. `CALL GetCasesByDateClosed(NULL);` - This line calls the stored procedure with `NULL` as the input date.
+
+10. `DROP PROCEDURE IF EXISTS GetCasesByDateClosed;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
+
+## USE_CASE_5:
