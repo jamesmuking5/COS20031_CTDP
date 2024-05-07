@@ -145,4 +145,3 @@ SELECT p.property_id, p.type,
 FROM property p
 WHERE p.user_id = 1001;
 ```
-```
