@@ -1,10 +1,8 @@
 # **Explanation:**
 
 ## USE_CASE_1:
-
+### Script: [use_case_1.sql](use_cases/use_case_1.sql)
 This SQL script involves fetching the duration of the latest case for a given user id and property id, if available and the case is closed.
-
-Here's a step-by-step explanation:
 
 1. **Create Procedure**: The script starts by creating a new stored procedure `GetCaseDuration`. This procedure does not take any input parameters.
 
@@ -62,113 +60,226 @@ DROP PROCEDURE IF EXISTS GetCaseDuration; -- Drop the procedure after use
 
 This script is useful to fetch the duration of the latest case for a specific user and property, if the case is closed. The duration is returned in the format 'X months, Y weeks, Z days, A hours, B minutes'.
 
-
 ## USE_CASE_2:
+### Script: [use_case_2.sql](use_cases/use_case_2.sql)
+This SQL script involves fetching all properties in a given city along with their types and the user id of the owner.
 
-This SQL script is creating a stored procedure named `GetPropertiesByCity` that takes a city name as an input and returns a list of properties in that city along with their property type and the user id of the property owner.
+1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetPropertiesByCity` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
 
-Here's a breakdown of the script:
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByCity;
+```
 
-1. `DROP PROCEDURE IF EXISTS GetPropertiesByCity;` - This line checks if a procedure named `GetPropertiesByCity` already exists in the database. If it does, it drops (deletes) it.
+2. **Create Procedure**: The script then creates a new stored procedure `GetPropertiesByCity`. This procedure takes one input parameter `city_name` of type `VARCHAR(16)`.
 
-2. `DELIMITER //` - This line changes the delimiter from the default semicolon (`;`) to double slashes (`//`). This is done because the stored procedure contains semicolons, and we don't want MySQL to think those are the end of the statement.
+```sql
+CREATE PROCEDURE GetPropertiesByCity(IN city_name VARCHAR(16))
+```
 
-3. `CREATE PROCEDURE GetPropertiesByCity(IN city_name VARCHAR(16))` - This line creates a new stored procedure named `GetPropertiesByCity`. It takes one input parameter, `city_name`, which is a string of up to 16 characters.
+3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties in the given city. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `city` fields. The `WHERE` clause filters the records where the `city` matches the input `city_name`.
 
-4. The `BEGIN ... END` block contains the SQL that will be run when the stored procedure is called. It's a `SELECT` statement that joins the `property`, `property_type`, and `property_owner` tables and filters for properties in the input city.
+```sql
+BEGIN
+    SELECT
+        p.property_id,
+        pt.pType_id,
+        pt.pType_Desc,
+        po.user_id,
+        po.user_name,
+        p.city
+    FROM
+        property p
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON p.user_id = po.user_id
+    WHERE
+        p.city = city_name;
+END //
+```
 
-5. `FROM property p JOIN property_type pt ON p.pType_id = pt.pType_id JOIN property_owner po ON p.user_id = po.user_id` - These lines join the `property` table (aliased as `p`), `property_type` table (aliased as `pt`), and `property_owner` table (aliased as `po`) based on the `pType_id` and `user_id`.
+4. **Call Procedure**: After creating the procedure, the script calls it with a sample city `"Kuching"` to fetch the properties in this city.
 
-6. `WHERE p.city = city_name;` - This line filters the results to only include properties where the city matches the input `city_name`.
+```sql
+CALL GetPropertiesByCity('Kuching');
+```
 
-7. `END //` - This line marks the end of the stored procedure.
+5. **Drop Procedure**: Finally, the script drops the procedure `GetPropertiesByCity` after it has been executed.
 
-8. `DELIMITER ;` - This line changes the delimiter back to the default semicolon (`;`).
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByCity;
+```
 
-9. `CALL GetPropertiesByCity('Kuching');` - This line calls the stored procedure with 'Kuching' as the input city.
-
-10. `DROP PROCEDURE IF EXISTS GetPropertiesByCity;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
+This script is useful to fetch all properties in a specific city along with their types and the user id of the owner.
 
 ## USE_CASE_3:
+### Script: [use_case_3.sql](use_cases/use_case_3.sql)
+This SQL script involves fetching all properties owned by a user, identified by their email address, along with their types.
 
-This SQL script is creating a stored procedure named `GetPropertiesByEmail` that takes an email address as an input and returns a list of properties associated with that email, along with their property type and the user details.
+1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetPropertiesByEmail` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
 
-Here's a breakdown of the script:
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByEmail;
+```
 
-1. `DROP PROCEDURE IF EXISTS GetPropertiesByEmail;` - This line checks if a procedure named `GetPropertiesByEmail` already exists in the database. If it does, it drops (deletes) it.
+2. **Create Procedure**: The script then creates a new stored procedure `GetPropertiesByEmail`. This procedure takes one input parameter `email_address` of type `VARCHAR(64)`.
 
-2. `DELIMITER //` - This line changes the delimiter from the default semicolon (`;`) to double slashes (`//`). This is done because the stored procedure contains semicolons, and we don't want MySQL to think those are the end of the statement.
+```sql
+CREATE PROCEDURE GetPropertiesByEmail(IN email_address VARCHAR(64))
+```
 
-3. `CREATE PROCEDURE GetPropertiesByEmail(IN email_address VARCHAR(64))` - This line creates a new stored procedure named `GetPropertiesByEmail`. It takes one input parameter, `email_address`, which is a string of up to 64 characters.
+3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties owned by the user with the given email address. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `user_email` fields. The `WHERE` clause filters the records where the `user_email` matches the input `email_address`.
 
-4. The `BEGIN ... END` block contains the SQL that will be run when the stored procedure is called. It's a `SELECT` statement that joins the `property`, `property_type`, and `property_owner` tables and filters for properties where the owner's email matches the input `email_address`.
+```sql
+BEGIN
+    SELECT
+        p.property_id,
+        pt.pType_id,
+        pt.pType_Desc,
+        po.user_id,
+        po.user_name,
+        po.user_email
+    FROM
+        property p
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON p.user_id = po.user_id
+    WHERE
+        po.user_email = email_address;
+END //
+```
 
-5. `FROM property p JOIN property_type pt ON p.pType_id = pt.pType_id JOIN property_owner po ON p.user_id = po.user_id` - These lines join the `property` table (aliased as `p`), `property_type` table (aliased as `pt`), and `property_owner` table (aliased as `po`) based on the `pType_id` and `user_id`.
+4. **Call Procedure**: After creating the procedure, the script calls it with a sample email address `"citzcovich8@weebly.com"` to fetch the properties owned by this user.
 
-6. `WHERE po.user_email = email_address;` - This line filters the results to only include properties where the owner's email matches the input `email_address`.
+```sql
+CALL GetPropertiesByEmail('citzcovich8@weebly.com');
+```
 
-7. `END //` - This line marks the end of the stored procedure.
+5. **Drop Procedure**: Finally, the script drops the procedure `GetPropertiesByEmail` after it has been executed.
 
-8. `DELIMITER ;` - This line changes the delimiter back to the default semicolon (`;`).
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByEmail;
+```
 
-9. `CALL GetPropertiesByEmail('citzcovich8@weebly.com');` - This line calls the stored procedure with 'citzcovich8@weebly.com' as the input email.
-
-10. `DROP PROCEDURE IF EXISTS GetPropertiesByEmail;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
+This script is useful to fetch all properties owned by a specific user, identified by their email address, along with their types.
 
 ## USE_CASE_4:
+### Script: [use_case_4.sql](use_cases/use_case_4.sql)
+This SQL script involves fetching all cases for properties of a property type based on the `date_closed` field from the `cases` table, along with the owner's name and email.
 
-This SQL script is creating a stored procedure named `GetCasesByDateClosed` that takes a date as an input and returns a list of cases that were closed on that date. The cases are associated with properties of a certain type and the owner's name and email are also returned.
+1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetCasesByDateClosed` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
 
-Here's a breakdown of the script:
+```sql
+DROP PROCEDURE IF EXISTS GetCasesByDateClosed;
+```
 
-1. `DROP PROCEDURE IF EXISTS GetCasesByDateClosed;` - This line checks if a procedure named `GetCasesByDateClosed` already exists in the database. If it does, it drops (deletes) it.
+2. **Create Procedure**: The script then creates a new stored procedure `GetCasesByDateClosed`. This procedure takes one input parameter `date_closed_value` of type `DATE`.
 
-2. `DELIMITER //` - This line changes the delimiter from the default semicolon (`;`) to double slashes (`//`). This is done because the stored procedure contains semicolons, and we don't want MySQL to think those are the end of the statement.
+```sql
+CREATE PROCEDURE GetCasesByDateClosed(IN date_closed_value DATE)
+```
 
-3. `CREATE PROCEDURE GetCasesByDateClosed(IN date_closed_value DATE)` - This line creates a new stored procedure named `GetCasesByDateClosed`. It takes one input parameter, `date_closed_value`, which is a date.
+3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch all cases for properties of a property type based on the `date_closed` field. The query joins the `cases`, `property`, `property_type`, `property_owner`, and `internal_staff` tables on their respective keys. It selects the `case_ref_id`, `user_id`, `user_name`, `user_email`, `staff_id`, `staff_name`, `pType_id`, `pType_Desc`, `case_Desc`, `staff_comment`, `date_opened`, and `date_closed` fields. The `WHERE` clause filters the records where the `date_closed` matches the input `date_closed_value` or both are `NULL`.
 
-4. The `BEGIN ... END` block contains the SQL that will be run when the stored procedure is called. It's a `SELECT` statement that joins the `cases`, `property`, `property_type`, `property_owner`, and `internal_staff` tables and filters for cases where the `date_closed` matches the input `date_closed_value` or both are `NULL`.
+```sql
+BEGIN
+    SELECT
+        c.case_ref_id,
+        c.user_id,
+        po.user_name,
+        po.user_email,
+        c.staff_id,
+        s.staff_name,
+        pt.pType_id,
+        pt.pType_Desc,
+        c.case_Desc,
+        c.staff_comment,
+        c.date_opened,
+        c.date_closed
+    FROM
+        cases c
+    JOIN property p ON c.property_id = p.property_id
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON c.user_id = po.user_id
+    JOIN internal_staff s ON c.staff_id = s.staff_id
+    WHERE
+        (c.date_closed = date_closed_value OR (date_closed_value IS NULL AND c.date_closed IS NULL));
+END //
+```
 
-5. `FROM cases c JOIN property p ON c.property_id = p.property_id JOIN property_type pt ON p.pType_id = pt.pType_id JOIN property_owner po ON c.user_id = po.user_id JOIN internal_staff s ON c.staff_id = s.staff_id` - These lines join the `cases` table (aliased as `c`), `property` table (aliased as `p`), `property_type` table (aliased as `pt`), `property_owner` table (aliased as `po`), and `internal_staff` table (aliased as `s`) based on the `property_id`, `pType_id`, `user_id`, and `staff_id`.
+4. **Call Procedure**: After creating the procedure, the script calls it with `NULL` as the parameter to fetch the cases where `date_closed` is `NULL`.
 
-6. `WHERE (c.date_closed = date_closed_value OR (date_closed_value IS NULL AND c.date_closed IS NULL));` - This line filters the results to only include cases where the `date_closed` matches the input `date_closed_value` or both are `NULL`.
+```sql
+CALL GetCasesByDateClosed(NULL);
+```
 
-7. `END //` - This line marks the end of the stored procedure.
+5. **Drop Procedure**: Finally, the script drops the procedure `GetCasesByDateClosed` after it has been executed.
 
-8. `DELIMITER ;` - This line changes the delimiter back to the default semicolon (`;`).
+```sql
+DROP PROCEDURE IF EXISTS GetCasesByDateClosed;
+```
 
-9. `CALL GetCasesByDateClosed(NULL);` - This line calls the stored procedure with `NULL` as the input date.
-
-10. `DROP PROCEDURE IF EXISTS GetCasesByDateClosed;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
+This script is useful to fetch all cases for properties of a property type based on the `date_closed` field from the `cases` table, along with the owner's name and email.
 
 ## USE_CASE_5:
+### Script: [use_case_5.py](use_cases/use_case_6.sql)
+This Python script involves authenticating a user by checking if the provided username and password exist in the `property_owner` table of the `beef_noodles_3` database.
 
-Use Case 5 is about user authentication using Python's `mysql-connector` to connect to a MySQL database. The script checks if a user exists in the database and whether the provided password is correct.
+1. **Establish Connection**: The script starts by establishing a connection to the MySQL database running on localhost.
 
-Here's a step-by-step explanation:
+```python
+cnx = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="beef_noodles_3"
+)
+```
 
-1. The script first establishes a connection to the MySQL database using `mysql.connector.connect()`. The connection parameters (host, user, password, and database) are provided.
+2. **Check Connection**: It then checks if the connection is successful.
 
-2. It checks if the connection is successful using `cnx.is_connected()`. If the connection is successful, it prints "Connection to database successful."
+```python
+if cnx.is_connected():
+    print("Connection to database successful.\n")
+```
 
-3. It defines a function `authenticate_user(cnx, username, password)` that takes a database connection, a username, and a password as arguments.
+3. **Authenticate User**: The script defines a function `authenticate_user` that takes a connection, a username, and a password as parameters. It first checks if the username exists in the `property_owner` table. If the user exists, it then checks if the provided password matches the one in the database.
 
-4. Inside the function, it creates a cursor from the connection using `cnx.cursor()`.
+```python
+def authenticate_user(cnx, username, password):
+    cursor = cnx.cursor()
+    cursor.execute(
+        "SELECT * FROM property_owner WHERE user_name = %s", (username,))
+    user = cursor.fetchone()
 
-5. It then executes a SQL query to select a user from the `property_owner` table where the username matches the provided username.
+    if user is None:
+        print("User not found.")
+    else:
+        cursor.execute(
+            "SELECT * FROM property_owner WHERE user_name = %s AND user_password = %s", (username, password))
+        user = cursor.fetchone()
+        if user is None:
+            print("User exists but password is incorrect")
+        else:
+            print("User exists and password is correct")
+```
 
-6. If the user does not exist (i.e., `cursor.fetchone()` returns `None`), it prints "User not found." If the user exists, it executes another SQL query to select the user where the username and password match the provided username and password.
+4. **Test Authentication**: The script then tests the `authenticate_user` function with four different combinations of correct and incorrect usernames and passwords.
 
-7. If the password is incorrect (i.e., `cursor.fetchone()` returns `None`), it prints "User exists but password is incorrect". If the password is correct, it prints "User exists and password is correct".
+```python
+authenticate_user(cnx, correct_property_owner_name, correct_property_owner_password)
+authenticate_user(cnx, correct_property_owner_name, wrong_property_owner_password)
+authenticate_user(cnx, wrong_property_owner_name, correct_property_owner_password)
+authenticate_user(cnx, wrong_property_owner_name, wrong_property_owner_password)
+```
 
-8. The function is then called four times with different combinations of correct and incorrect usernames and passwords to demonstrate different outcomes.
+5. **Close Connection**: Finally, the script closes the connection to the database.
 
-9. For security purposes, if the password is correct and the username is wrong, the script will also return "No users found".
+```python
+cnx.close()
+```
 
-10.  Finally, the script closes the database connection using `cnx.close()`.
+This script is useful for authenticating users by checking if their provided username and password exist in the `property_owner` table of the `beef_noodles_3` database.
 
 ## USE_CASE_6:
-
+### Script: [use_case_6.sql](use_cases/use_case_5.py)
 This SQL script involves fetching all properties owned by a user given their email address. The properties are fetched along with their types.
 
 Here's a step-by-step explanation:
@@ -220,20 +331,27 @@ DROP PROCEDURE IF EXISTS GetPropertiesByUserEmail;
 
 This script is useful to fetch all properties owned by a specific user using their email address. The properties are returned along with their types.
 
-## USE_CASE_7
-This SQL query is designed to retrieve a list of properties of a specific type, along with the details of their respective owners. 
+## USE_CASE_7:
+### Script: [use_case_7.sql](use_cases/use_case_7.sql)
+This SQL script involves fetching all properties of a given property type along with the property owner details from the `property`, `property_type`, and `property_owner` tables.
 
-Here's how it works:
+1. **SQL Query**: The script executes a `SELECT` query to fetch all properties of a given property type along with the property owner details. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `city`, `user_id`, `user_name`, and `user_email` fields. The `WHERE` clause filters the records where the `pType_Desc` matches "Terrace Double".
 
-1. `SELECT`: This keyword is used to specify the data we want to retrieve from the database. In this case, we're retrieving the property ID, property type ID, property type description, city, user ID, user name, and user email.
+```sql
+SELECT
+    p.property_id,
+    pt.pType_id,
+    pt.pType_Desc,
+    p.city,
+    po.user_id,
+    po.user_name,
+    po.user_email
+FROM
+    property p
+JOIN property_type pt ON p.pType_id = pt.pType_id
+JOIN property_owner po ON p.user_id = po.user_id
+WHERE
+    pt.pType_Desc = "Terrace Double";
+```
 
-2. `FROM property p`: This specifies the main table we're retrieving data from, which is the `property` table. The `p` is an alias for `property`, making the rest of the query easier to read and write.
-
-3. `JOIN property_type pt ON p.pType_id = pt.pType_id`: This is a JOIN operation, which combines rows from two or more tables based on a related column. Here, we're joining the `property` table with the `property_type` table based on the `pType_id` column.
-
-4. `JOIN property_owner po ON p.user_id = po.user_id`: This is another JOIN operation, this time joining the `property` table with the `property_owner` table based on the `user_id` column.
-
-5. `WHERE pt.pType_Desc = "Terrace Double"`: This is a WHERE clause, which is used to filter records. This clause filters out all records where the property type description is not "Terrace Double".
-
-So, in summary, this query retrieves all properties of type "Terrace Double", along with their respective owner details.
-
+This script is useful to fetch all properties of a given property type along with the property owner details from the `property`, `property_type`, and `property_owner` tables.
