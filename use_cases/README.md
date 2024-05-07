@@ -179,3 +179,21 @@ DROP PROCEDURE IF EXISTS GetPropertiesByUserEmail;
 ```
 
 This script is useful to fetch all properties owned by a specific user using their email address. The properties are returned along with their types.
+
+## USE_CASE_7
+This SQL query is designed to retrieve a list of properties of a specific type, along with the details of their respective owners. 
+
+Here's how it works:
+
+1. `SELECT`: This keyword is used to specify the data we want to retrieve from the database. In this case, we're retrieving the property ID, property type ID, property type description, city, user ID, user name, and user email.
+
+2. `FROM property p`: This specifies the main table we're retrieving data from, which is the `property` table. The `p` is an alias for `property`, making the rest of the query easier to read and write.
+
+3. `JOIN property_type pt ON p.pType_id = pt.pType_id`: This is a JOIN operation, which combines rows from two or more tables based on a related column. Here, we're joining the `property` table with the `property_type` table based on the `pType_id` column.
+
+4. `JOIN property_owner po ON p.user_id = po.user_id`: This is another JOIN operation, this time joining the `property` table with the `property_owner` table based on the `user_id` column.
+
+5. `WHERE pt.pType_Desc = "Terrace Double"`: This is a WHERE clause, which is used to filter records. This clause filters out all records where the property type description is not "Terrace Double".
+
+So, in summary, this query retrieves all properties of type "Terrace Double", along with their respective owner details.
+
