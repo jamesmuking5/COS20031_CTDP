@@ -1,4 +1,4 @@
--- Use Case 4: Based on date_closed from cases table, list all cases for properties of a propety_type along with the oiwner's name and email
+-- Use Case 4: Based on date_closed from cases table, list all cases for properties of a propety_type along with the owner's name and email
 -- Sample to use: date_closed = NULL
 -- Sample output: case_ref_id, user_id, user_name, user_email, staff_id, staff_name, property_id, pType_Desc, case_Desc, staff_comment, date_opened, date_closed
 

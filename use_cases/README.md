@@ -102,3 +102,25 @@ Here's a breakdown of the script:
 10. `DROP PROCEDURE IF EXISTS GetCasesByDateClosed;` - This line drops the procedure after it has been used. This is not typically done in production environments, but might be useful for testing or temporary procedures.
 
 ## USE_CASE_5:
+
+Use Case 5 is about user authentication using Python's `mysql-connector` to connect to a MySQL database. The script checks if a user exists in the database and whether the provided password is correct. Here's a step-by-step explanation:
+
+1. The script first establishes a connection to the MySQL database using `mysql.connector.connect()`. The connection parameters (host, user, password, and database) are provided.
+
+2. It checks if the connection is successful using `cnx.is_connected()`. If the connection is successful, it prints "Connection to database successful."
+
+3. It defines a function `authenticate_user(cnx, username, password)` that takes a database connection, a username, and a password as arguments.
+
+4. Inside the function, it creates a cursor from the connection using `cnx.cursor()`.
+
+5. It then executes a SQL query to select a user from the `property_owner` table where the username matches the provided username.
+
+6. If the user does not exist (i.e., `cursor.fetchone()` returns `None`), it prints "User not found." If the user exists, it executes another SQL query to select the user where the username and password match the provided username and password.
+
+7. If the password is incorrect (i.e., `cursor.fetchone()` returns `None`), it prints "User exists but password is incorrect". If the password is correct, it prints "User exists and password is correct".
+
+8. The function is then called four times with different combinations of correct and incorrect usernames and passwords to demonstrate different outcomes.
+
+9. For security purposes, if the password is correct and the username is wrong, the script will also return "No users found".
+
+10.  Finally, the script closes the database connection using `cnx.close()`.
