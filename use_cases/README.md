@@ -103,7 +103,9 @@ Here's a breakdown of the script:
 
 ## USE_CASE_5:
 
-Use Case 5 is about user authentication using Python's `mysql-connector` to connect to a MySQL database. The script checks if a user exists in the database and whether the provided password is correct. Here's a step-by-step explanation:
+Use Case 5 is about user authentication using Python's `mysql-connector` to connect to a MySQL database. The script checks if a user exists in the database and whether the provided password is correct.
+
+Here's a step-by-step explanation:
 
 1. The script first establishes a connection to the MySQL database using `mysql.connector.connect()`. The connection parameters (host, user, password, and database) are provided.
 
@@ -124,3 +126,56 @@ Use Case 5 is about user authentication using Python's `mysql-connector` to conn
 9. For security purposes, if the password is correct and the username is wrong, the script will also return "No users found".
 
 10.  Finally, the script closes the database connection using `cnx.close()`.
+
+## USE_CASE_6:
+
+This SQL script involves fetching all properties owned by a user given their email address. The properties are fetched along with their types.
+
+Here's a step-by-step explanation:
+
+1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetPropertiesByUserEmail` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
+
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByUserEmail;
+```
+
+2. **Create Procedure**: The script then creates a new stored procedure `GetPropertiesByUserEmail`. This procedure takes one input parameter `user_email_value` of type `VARCHAR(100)`.
+
+```sql
+CREATE PROCEDURE GetPropertiesByUserEmail(IN user_email_value VARCHAR(100))
+```
+
+3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties owned by the user with the given email. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `city`, `user_id`, `user_name`, and `user_email` fields. The `WHERE` clause filters the records where the `user_email` matches the input `user_email_value`.
+
+```sql
+BEGIN
+    SELECT
+        p.property_id,
+        pt.pType_id,
+        pt.pType_Desc,
+        p.city,
+        po.user_id,
+        po.user_name,
+        po.user_email
+    FROM
+        property p
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON p.user_id = po.user_id
+    WHERE
+        po.user_email = user_email_value;
+END //
+```
+
+4. **Call Procedure**: After creating the procedure, the script calls it with a sample email `"tkinningleyb@nasa.gov"` to fetch the properties owned by the user with this email.
+
+```sql
+CALL GetPropertiesByUserEmail("tkinningleyb@nasa.gov");
+```
+
+5. **Drop Procedure**: Finally, the script drops the procedure `GetPropertiesByUserEmail` after it has been executed.
+
+```sql
+DROP PROCEDURE IF EXISTS GetPropertiesByUserEmail;
+```
+
+This script is useful to fetch all properties owned by a specific user using their email address. The properties are returned along with their types.
