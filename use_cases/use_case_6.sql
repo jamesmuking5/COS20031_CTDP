@@ -1,4 +1,4 @@
--- Use Case 4: Given an input user_email, fetch all properties owned by the user along with the property type
+-- Use Case 6: Given an input user_email, fetch all properties owned by the user along with the property type
 -- Sample email: "tkinningleyb@nasa.gov"
 -- Sample output: '42', '5', 'Terrace Double', 'Kuching', '12', 'Tedmund Kinningley', 'tkinningleyb@nasa.gov'
 -- '43', '4', 'Terrace Single', 'Miri', '12', 'Tedmund Kinningley', 'tkinningleyb@nasa.gov'

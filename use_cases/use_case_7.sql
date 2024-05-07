@@ -1,4 +1,4 @@
--- Use Case 4: Given a property type, list all properties of that type along with the property owner details
+-- Use Case 7: Given a property type, list all properties of that type along with the property owner details
 -- Sample property type: "Terrace Double" 
 -- Sample output: '10', '5', 'Terrace Double', 'Bintulu', '3', 'Penrod Jumel', 'pjumel2@amazon.de' (1st row)
 

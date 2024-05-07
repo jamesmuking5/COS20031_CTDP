@@ -1,4 +1,4 @@
-# Use case 5, using python's mysqlconnector to connect to the database
+# Use Case 5, using python's mysqlconnector to connect to the database
 # Using 4 combinations between correct/incorrect username and passwords, check if the user is in the database and if authentication is succesful
 
 import mysql.connector
