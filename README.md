@@ -146,5 +146,3 @@ FROM property p
 WHERE p.user_id = 1001;
 ```
 ```
-
-This refactoring provides a clear structure and makes it easier to navigate the document.
