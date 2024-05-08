@@ -430,4 +430,4 @@ GROUP BY
     s.staff_phone,
     s.staff_email;
 ```
-This script is handy for when the `customer server manager` would like to get a quick gauge of staff efficiency and performance.
+This script is handy for when the `customer service manager` would like to get a quick gauge of staff efficiency and performance.
