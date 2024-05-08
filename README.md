@@ -355,3 +355,79 @@ WHERE
 ```
 
 This script is useful to fetch all properties of a given property type along with the property owner details from the `property`, `property_type`, and `property_owner` tables.
+
+## USE_CASE_8:
+### Script: [use_case_8.sql](use_cases/use_case_8.sql)
+This SQL script lists all `property owners (users)` that `own (not rented)` more than one property along with the count of properties they own.
+
+1. **SQL Query**:  The script executes a `SELECT` query to fetch all property owners who own more than one property. The query joins the `property_owner` and `property` tables on their `user_id` field. It selects the `user_id`, `user_name`, and counts the number of properties associated with each user. The `WHERE` clause filters the records where the `ownership_status is 1`, indicating the property is owned. The `GROUP BY` clause groups the records by `user_id`, and the `HAVING` clause filters the groups to include only those where the count of properties is more than 1.
+
+```sql
+SELECT po.user_id, po.user_name, COUNT(*) AS property_count
+FROM
+    property_owner po
+    INNER JOIN property p ON po.user_id = p.user_id 
+WHERE
+    p.ownership_status = 1 
+GROUP BY
+    po.user_id 
+HAVING
+    COUNT(*) > 1;
+```
+This script is useful for trying to see which `property owner` owns more than 1 property.
+
+## USE_CASE_9:
+### Script: [use_case_9.sql](use_cases/use_case_9.sql)
+This SQL script involves searching for properties with `floorplan defects` that are reported in `cases` while excluding cases that have already been resolved.
+
+1. **SQL Query**: The script executes a `SELECT` query to fetch all properties with specific defects that are reported in cases, excluding those that have already been resolved. The query joins the `property` and `cases` tables on their `property_id` field. It selects the `case_ref_id`, `property_id`, `case_desc`, `user_id`, `staff_id`, `date_opened`, and `staff_comment` fields. The `WHERE` clause filters the records where the `case_desc` matches `"Wall defect"`, `"Flooring issue"`, or `"Roofing issue"`, indicating the type of defect.
+
+```sql
+SELECT c.case_ref_id, p.property_id, c.case_desc, c.user_id, c.staff_id, c.date_opened, c.staff_comment
+FROM property p
+    INNER JOIN cases c ON p.property_id = c.property_id
+WHERE
+    c.case_desc IN (
+        'Wall defect',
+        'Flooring issue',
+        'Roofing issue',
+        'Door issue',
+        'Window issue'
+    )
+    AND c.staff_comment != 'Resolved'
+    AND c.date_closed IS NULL;
+```
+This script is useful to search for open or unresolved cases as well as the type of defect and on which property from the `cases` table.
+
+## USE_CASE_10:
+### Script: [use_case_10.sql](use_cases/use_case_10.sql)
+This SQL script lists all staff members who have unresolved cases, along with the number of unresolved cases and the total number of cases they have handled.
+
+1. **SQL Query**: The script executes a `SELECT` query to fetch all staff members along with their details and the number of unresolved, resolved, and total cases they have handled. The query joins the `cases` and `internal_staff` tables on their respective keys. It selects the `staff_id`, `staff_name`, `staff_phone`, `staff_email`, and counts of unresolved, resolved, and total cases.
+
+```sql
+SELECT
+    c.staff_id,
+    s.staff_name,
+    s.staff_phone,
+    s.staff_email,
+    COUNT(
+        CASE
+            WHEN c.date_closed IS NULL THEN 1
+        END
+    ) AS unresolved,
+    COUNT(
+        CASE
+            WHEN c.date_closed IS NOT NULL THEN 1
+        END
+    ) AS resolved,
+    COUNT(*) AS total_cases
+FROM cases c
+    INNER JOIN internal_staff s ON c.staff_id = s.staff_id
+GROUP BY
+    c.staff_id,
+    s.staff_name,
+    s.staff_phone,
+    s.staff_email;
+```
+This script is handy for when the `customer server manager` would like to get a quick gauge of staff efficiency and performance.
