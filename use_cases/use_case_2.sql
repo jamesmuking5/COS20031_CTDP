@@ -2,12 +2,14 @@
 -- Sample to use: city = 'Kuching'
 -- Sample output: property_id, property_name, property_type, user_id
 
+CREATE INDEX idx_city ON property(city);
+
 DROP PROCEDURE IF EXISTS GetPropertiesByCity; -- Drop the procedure after use
 
 DELIMITER //
 CREATE PROCEDURE GetPropertiesByCity(IN city_name VARCHAR(16))
 BEGIN
-    SELECT
+    EXPLAIN SELECT
         p.property_id,
         pt.pType_id,
         pt.pType_Desc,
@@ -26,3 +28,4 @@ DELIMITER ;
 
 CALL GetPropertiesByCity('Kuching'); -- Call the procedure
 DROP PROCEDURE IF EXISTS GetPropertiesByCity; -- Drop the procedure after use
+DROP INDEX idx_city ON property;
