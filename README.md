@@ -1,5 +1,11 @@
 # **Explanation:**
 
+#### Use-cases that uses manual indexing.
+- USE_CASE_2
+- USE_CASE_3
+- USE_CASE_8
+
+
 ## USE_CASE_1:
 ### Script: [use_case_1.sql](use_cases/use_case_1.sql)
 This SQL script involves fetching the duration of the latest case for a given user id and property id, if available and the case is closed.
@@ -131,7 +137,7 @@ CALL GetPropertiesByCity('Kuching');
 CALL ExplainGetPropertiesByCity('Kuching');
 ```
 
-7. **Drop Procedure and Index**: Finally, the script drops the procedures `GetPropertiesByCity` and `ExplainGetPropertiesByCity` and the index `idx_city` after they have been used.
+7. **Drop Procedure and Index**: Finally, the script drops the procedures `GetPropertiesByCity` and `ExplainGetPropertiesByCity` and the index `idx_city` after they have been used after demonstrating its purpose.
 
 ```sql
 DROP PROCEDURE IF EXISTS GetPropertiesByCity;
