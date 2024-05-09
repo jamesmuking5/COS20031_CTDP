@@ -2,8 +2,11 @@
 
 #### Use-cases that uses manual indexing.
 - USE_CASE_2
+  - `idx_city`
 - USE_CASE_3
-- USE_CASE_8
+  - `idx_email`
+  - `user_prop_id`
+- USE_CASE_9
 
 
 ## USE_CASE_1:
@@ -149,21 +152,28 @@ This script is useful to fetch all properties in a specific city along with thei
 
 ## USE_CASE_3:
 ### Script: [use_case_3.sql](use_cases/use_case_3.sql)
-This SQL script involves fetching all properties owned by a user, identified by their email address, along with their types.
+This SQL script involves fetching all properties owned by a user, identified by their email address, along with their types. It also creates an index on the `user_email` column of the `property_owner` table to optimize the query performance. Additionally, it includes an `EXPLAIN` statement to provide information about how MySQL executes the query.
 
-1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetPropertiesByEmail` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
+1. **Create Index**: The script starts by creating an index `idx_email` on the `user_email` column of the `property_owner` table. This is to optimize the performance of the `SELECT` query that filters records based on the `user_email`.
+
+```sql
+CREATE INDEX idx_email ON property_owner(user_email);
+```
+
+2. **Drop Procedure if Exists**: The script then drops the stored procedures `GetPropertiesByEmail` and `ExplainGetPropertiesByEmail` if they already exist in the database. This is to ensure that the procedures are created fresh each time the script runs.
 
 ```sql
 DROP PROCEDURE IF EXISTS GetPropertiesByEmail;
+DROP PROCEDURE IF EXISTS ExplainGetPropertiesByEmail;
 ```
 
-2. **Create Procedure**: The script then creates a new stored procedure `GetPropertiesByEmail`. This procedure takes one input parameter `email_address` of type `VARCHAR(64)`.
+3. **Create Procedure**: The script creates a new stored procedure `GetPropertiesByEmail`. This procedure takes one input parameter `email_address` of type `VARCHAR(64)`.
 
 ```sql
 CREATE PROCEDURE GetPropertiesByEmail(IN email_address VARCHAR(64))
 ```
 
-3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties owned by the user with the given email address. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `user_email` fields. The `WHERE` clause filters the records where the `user_email` matches the input `email_address`.
+4. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties owned by the user with the given email address. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `user_email` fields. The `WHERE` clause filters the records where the `user_email` matches the input `email_address`.
 
 ```sql
 BEGIN
@@ -183,19 +193,43 @@ BEGIN
 END //
 ```
 
-4. **Call Procedure**: After creating the procedure, the script calls it with a sample email address `"citzcovich8@weebly.com"` to fetch the properties owned by this user.
+5. **Create Explain Procedure**: The script creates another stored procedure `ExplainGetPropertiesByEmail` which is similar to `GetPropertiesByEmail` but includes an `EXPLAIN` statement before the `SELECT` query. This provides information about how MySQL executes the query.
+
+```sql
+CREATE PROCEDURE ExplainGetPropertiesByEmail(IN email_address VARCHAR(64))
+BEGIN
+    EXPLAIN SELECT
+        p.property_id,
+        pt.pType_id,
+        pt.pType_Desc,
+        po.user_id,
+        po.user_name,
+        po.user_email
+    FROM
+        property p
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON p.user_id = po.user_id
+    WHERE
+        po.user_email = email_address;
+END //
+```
+
+6. **Call Procedures**: After creating the procedures, the script calls them with a sample email address `"citzcovich8@weebly.com"` to fetch the properties owned by this user and explain the query execution.
 
 ```sql
 CALL GetPropertiesByEmail('citzcovich8@weebly.com');
+CALL ExplainGetPropertiesByEmail('citzcovich8@weebly.com');
 ```
 
-5. **Drop Procedure**: Finally, the script drops the procedure `GetPropertiesByEmail` after it has been executed.
+7. **Drop Procedure and Index**: Finally, the script drops the procedures `GetPropertiesByEmail` and `ExplainGetPropertiesByEmail` and the index `idx_email` after they have been used.
 
 ```sql
 DROP PROCEDURE IF EXISTS GetPropertiesByEmail;
+DROP PROCEDURE IF EXISTS ExplainGetPropertiesByEmail;
+DROP INDEX idx_email ON property_owner;
 ```
 
-This script is useful to fetch all properties owned by a specific user, identified by their email address, along with their types.
+This script is useful to fetch all properties owned by a specific user, identified by their email address, along with their types. The index on the `user_email` column improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
 
 ## USE_CASE_4:
 ### Script: [use_case_4.sql](use_cases/use_case_4.sql)
