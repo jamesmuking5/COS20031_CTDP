@@ -1,13 +1,14 @@
 # **Explanation:**
 
-#### Use-cases that uses manual indexing.
+## Indexed Use-cases
+### Use-cases that uses manual indexing.
 - USE_CASE_2
   - `idx_city`
 - USE_CASE_3
   - `idx_email`
   - `user_prop_id`
-- USE_CASE_9
-
+- USE_CASE_8
+  - `idx_ownership_user_id`
 
 ## USE_CASE_1:
 ### Script: [use_case_1.sql](use_cases/use_case_1.sql)
@@ -429,9 +430,15 @@ This script is useful to fetch all properties of a given property type along wit
 
 ## USE_CASE_8:
 ### Script: [use_case_8.sql](use_cases/use_case_8.sql)
-This SQL script lists all `property owners (users)` that `own (not rented)` more than one property along with the count of properties they own.
+This SQL script lists all `property owners (users)` that `own (not rented)` more than one property along with the count of properties they own. It also creates an index on the `ownership_status` and `user_id` columns of the `property` table to optimize the query performance. Additionally, it includes an `EXPLAIN` statement to provide information about how MySQL executes the query.
 
-1. **SQL Query**:  The script executes a `SELECT` query to fetch all property owners who own more than one property. The query joins the `property_owner` and `property` tables on their `user_id` field. It selects the `user_id`, `user_name`, and counts the number of properties associated with each user. The `WHERE` clause filters the records where the `ownership_status is 1`, indicating the property is owned. The `GROUP BY` clause groups the records by `user_id`, and the `HAVING` clause filters the groups to include only those where the count of properties is more than 1.
+1. **Create Index**: The script starts by creating an index `idx_ownership_user_id` on the `ownership_status` and `user_id` columns of the `property` table. This is to optimize the performance of the `SELECT` query that filters records based on the `ownership_status` and groups them by `user_id`.
+
+```sql
+CREATE INDEX idx_ownership_user_id ON property (ownership_status, user_id);
+```
+
+2. **SQL Query**: The script executes a `SELECT` query to fetch all property owners who own more than one property. The query joins the `property_owner` and `property` tables on their `user_id` field. It selects the `user_id`, `user_name`, and counts the number of properties associated with each user. The `WHERE` clause filters the records where the `ownership_status is 1`, indicating the property is owned. The `GROUP BY` clause groups the records by `user_id`, and the `HAVING` clause filters the groups to include only those where the count of properties is more than 1.
 
 ```sql
 SELECT po.user_id, po.user_name, COUNT(*) AS property_count
@@ -445,7 +452,29 @@ GROUP BY
 HAVING
     COUNT(*) > 1;
 ```
-This script is useful for trying to see which `property owner` owns more than 1 property.
+
+3. **Explain Query**: The script includes an `EXPLAIN` statement before the `SELECT` query. This provides information about how MySQL executes the query.
+
+```sql
+EXPLAIN SELECT po.user_id, po.user_name, COUNT(*) AS property_count
+FROM
+    property_owner po
+    INNER JOIN property p ON po.user_id = p.user_id 
+WHERE
+    p.ownership_status = 1 
+GROUP BY
+    po.user_id 
+HAVING
+    COUNT(*) > 1;
+```
+
+4. **Drop Index**: Finally, the script drops the index `idx_ownership_user_id` after it has been used.
+
+```sql
+DROP INDEX idx_ownership_user_id ON property;
+```
+
+This script is useful for trying to see which `property owner` owns more than 1 property. The index on the `ownership_status` and `user_id` columns improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
 
 ## USE_CASE_9:
 ### Script: [use_case_9.sql](use_cases/use_case_9.sql)
