@@ -62,21 +62,28 @@ This script is useful to fetch the duration of the latest case for a specific us
 
 ## USE_CASE_2:
 ### Script: [use_case_2.sql](use_cases/use_case_2.sql)
-This SQL script involves fetching all properties in a given city along with their types and the user id of the owner.
+This SQL script involves fetching all properties in a given city along with their types and the user id of the owner. It also creates an index on the `city` column of the `property` table to optimize the query performance. Additionally, it includes an `EXPLAIN` statement to provide information about how MySQL executes the query.
 
-1. **Drop Procedure if Exists**: The script starts by dropping the stored procedure `GetPropertiesByCity` if it already exists in the database. This is to ensure that the procedure is created fresh each time the script runs.
+1. **Create Index**: The script starts by creating an index `idx_city` on the `city` column of the `property` table. This is to optimize the performance of the `SELECT` query that filters records based on the `city`.
+
+```sql
+CREATE INDEX idx_city ON property(city);
+```
+
+2. **Drop Procedure if Exists**: The script then drops the stored procedures `GetPropertiesByCity` and `ExplainGetPropertiesByCity` if they already exist in the database. This is to ensure that the procedures are created fresh each time the script runs.
 
 ```sql
 DROP PROCEDURE IF EXISTS GetPropertiesByCity;
+DROP PROCEDURE IF EXISTS ExplainGetPropertiesByCity;
 ```
 
-2. **Create Procedure**: The script then creates a new stored procedure `GetPropertiesByCity`. This procedure takes one input parameter `city_name` of type `VARCHAR(16)`.
+3. **Create Procedure**: The script creates a new stored procedure `GetPropertiesByCity`. This procedure takes one input parameter `city_name` of type `VARCHAR(16)`.
 
 ```sql
 CREATE PROCEDURE GetPropertiesByCity(IN city_name VARCHAR(16))
 ```
 
-3. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties in the given city. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `city` fields. The `WHERE` clause filters the records where the `city` matches the input `city_name`.
+4. **SQL Query**: Inside the procedure, it executes a `SELECT` query to fetch the properties in the given city. The query joins the `property`, `property_type`, and `property_owner` tables on their respective keys. It selects the `property_id`, `pType_id`, `pType_Desc`, `user_id`, `user_name`, and `city` fields. The `WHERE` clause filters the records where the `city` matches the input `city_name`.
 
 ```sql
 BEGIN
@@ -96,19 +103,43 @@ BEGIN
 END //
 ```
 
-4. **Call Procedure**: After creating the procedure, the script calls it with a sample city `"Kuching"` to fetch the properties in this city.
+5. **Create Explain Procedure**: The script creates another stored procedure `ExplainGetPropertiesByCity` which is similar to `GetPropertiesByCity` but includes an `EXPLAIN` statement before the `SELECT` query. This provides information about how MySQL executes the query.
+
+```sql
+CREATE PROCEDURE ExplainGetPropertiesByCity(IN city_name VARCHAR(16))
+BEGIN
+    EXPLAIN SELECT
+        p.property_id,
+        pt.pType_id,
+        pt.pType_Desc,
+        po.user_id,
+        po.user_name,
+        p.city
+    FROM
+        property p
+    JOIN property_type pt ON p.pType_id = pt.pType_id
+    JOIN property_owner po ON p.user_id = po.user_id
+    WHERE
+        p.city = city_name;
+END //
+```
+
+6. **Call Procedures**: After creating the procedures, the script calls them with a sample city `"Kuching"` to fetch the properties in this city and explain the query execution.
 
 ```sql
 CALL GetPropertiesByCity('Kuching');
+CALL ExplainGetPropertiesByCity('Kuching');
 ```
 
-5. **Drop Procedure**: Finally, the script drops the procedure `GetPropertiesByCity` after it has been executed.
+7. **Drop Procedure and Index**: Finally, the script drops the procedures `GetPropertiesByCity` and `ExplainGetPropertiesByCity` and the index `idx_city` after they have been used.
 
 ```sql
 DROP PROCEDURE IF EXISTS GetPropertiesByCity;
+DROP PROCEDURE IF EXISTS ExplainGetPropertiesByCity;
+DROP INDEX idx_city ON property;
 ```
 
-This script is useful to fetch all properties in a specific city along with their types and the user id of the owner.
+This script is useful to fetch all properties in a specific city along with their types and the user id of the owner. The index on the `city` column improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
 
 ## USE_CASE_3:
 ### Script: [use_case_3.sql](use_cases/use_case_3.sql)
