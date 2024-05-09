@@ -568,3 +568,7 @@ GROUP BY
     s.staff_email;
 ```
 This script is handy for when the `customer service manager` would like to get a quick gauge of staff efficiency and performance.
+
+
+TRANSACTIONS: 
+Transactions are not needed in these use cases as they involve read-only operations that do not modify the database's state. Each SELECT query retrieves data independently and does not depend on the success or failure of other queries in a transactional context.
