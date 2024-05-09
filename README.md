@@ -70,6 +70,11 @@ DROP PROCEDURE IF EXISTS GetCaseDuration; -- Drop the procedure after use
 
 This script is useful to fetch the duration of the latest case for a specific user and property, if the case is closed. The duration is returned in the format 'X months, Y weeks, Z days, A hours, B minutes'.
 
+```
+Scenario:
+A user wants to retrieve the duration of the latest case associated with a specific user ID and property ID. They are interested in knowing how long the case lasted, provided it has been closed (date_closed is not null).
+```
+
 ## USE_CASE_2:
 ### Script: [use_case_2.sql](use_cases/use_case_2.sql)
 This SQL script involves fetching all properties in a given city along with their types and the user id of the owner. It also creates an index on the `city` column of the `property` table to optimize the query performance. Additionally, it includes an `EXPLAIN` statement to provide information about how MySQL executes the query.
@@ -150,6 +155,11 @@ DROP INDEX idx_city ON property;
 ```
 
 This script is useful to fetch all properties in a specific city along with their types and the user id of the owner. The index on the `city` column improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
+
+```
+Scenario:
+A user wants to obtain a list of properties located in a specific city. For each property in the city, they also want to know the property type and the user ID of the owner.
+```
 
 ## USE_CASE_3:
 ### Script: [use_case_3.sql](use_cases/use_case_3.sql)
@@ -232,6 +242,11 @@ DROP INDEX idx_email ON property_owner;
 
 This script is useful to fetch all properties owned by a specific user, identified by their email address, along with their types. The index on the `user_email` column improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
 
+```
+Scenario:
+A user wants to retrieve all properties associated with a specific email address from the property_owner table. For each property, they also want to know the property type description, user ID, user name, and email address.
+```
+
 ## USE_CASE_4:
 ### Script: [use_case_4.sql](use_cases/use_case_4.sql)
 This SQL script involves fetching all cases for properties of a property type based on the `date_closed` field from the `cases` table, along with the owner's name and email.
@@ -289,6 +304,11 @@ DROP PROCEDURE IF EXISTS GetCasesByDateClosed;
 ```
 
 This script is useful to fetch all cases for properties of a property type based on the `date_closed` field from the `cases` table, along with the owner's name and email.
+
+```
+Scenario:
+A user wants to retrieve all cases for properties of a specific property type, along with the owner's name and email. They are interested in cases where the date_closed field matches a given date or is NULL.
+```
 
 ## USE_CASE_5:
 ### Script: [use_case_5.py](use_cases/use_case_6.sql)
@@ -350,6 +370,11 @@ cnx.close()
 
 This script is useful for authenticating users by checking if their provided username and password exist in the `property_owner` table of the `beef_noodles_3` database.
 
+```
+Scenario:
+A user needs to verify the authenticity of a user by checking if the provided username and password exist in the property_owner table of the beef_noodles_3 database. It establishes a connection to the database and utilizes a function authenticate_user to perform the authentication process.
+```
+
 ## USE_CASE_6:
 ### Script: [use_case_6.sql](use_cases/use_case_5.py)
 This SQL script involves fetching all properties owned by a user given their email address. The properties are fetched along with their types.
@@ -403,6 +428,11 @@ DROP PROCEDURE IF EXISTS GetPropertiesByUserEmail;
 
 This script is useful to fetch all properties owned by a specific user using their email address. The properties are returned along with their types.
 
+```
+Scenario:
+A user wants to retrieve all properties owned by a specific user, identified by their email address. They are interested in fetching details about each property, including the property type. It employs a stored procedure GetPropertiesByUserEmail to retrieve the properties based on the input email address.
+```
+
 ## USE_CASE_7:
 ### Script: [use_case_7.sql](use_cases/use_case_7.sql)
 This SQL script involves fetching all properties of a given property type along with the property owner details from the `property`, `property_type`, and `property_owner` tables.
@@ -427,6 +457,12 @@ WHERE
 ```
 
 This script is useful to fetch all properties of a given property type along with the property owner details from the `property`, `property_type`, and `property_owner` tables.
+
+```
+Scenario:
+A user wants to retrieve a list of all properties belonging to a specific property type. They are interested in obtaining details about each property, including information about the property owner.
+
+```
 
 ## USE_CASE_8:
 ### Script: [use_case_8.sql](use_cases/use_case_8.sql)
@@ -476,6 +512,12 @@ DROP INDEX idx_ownership_user_id ON property;
 
 This script is useful for trying to see which `property owner` owns more than 1 property. The index on the `ownership_status` and `user_id` columns improves the performance of the `SELECT` query. The `EXPLAIN` statement provides insights into the query execution which can be useful for performance tuning.
 
+```
+Scenario:
+A user needs to generate a list of property owners (users) who own more than one property and have not rented out any of them.
+
+```
+
 ## USE_CASE_9:
 ### Script: [use_case_9.sql](use_cases/use_case_9.sql)
 This SQL script involves searching for properties with `floorplan defects` that are reported in `cases` while excluding cases that have already been resolved.
@@ -498,6 +540,12 @@ WHERE
     AND c.date_closed IS NULL;
 ```
 This script is useful to search for open or unresolved cases as well as the type of defect and on which property from the `cases` table.
+
+```
+Scenario:
+A user needs to identify properties with reported floorplan defects in cases, excluding those cases that have been resolved (i.e., date_closed is not NULL).
+
+```
 
 ## USE_CASE_10:
 ### Script: [use_case_10.sql](use_cases/use_case_10.sql)
@@ -531,3 +579,8 @@ GROUP BY
     s.staff_email;
 ```
 This script is handy for when the `customer service manager` would like to get a quick gauge of staff efficiency and performance.
+
+```
+Scenario:
+A user wants to generate a list of staff members along with the number of unresolved cases (where date_closed is NULL), the number of resolved cases (where date_closed is not NULL), and the total number of cases handled by each staff member.
+```
